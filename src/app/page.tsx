@@ -1,45 +1,19 @@
 'use client'
-import { Button, AppBar, Toolbar, Typography, Box, IconButton } from '@mui/material';
+import  { ButtonAppBar }  from './components/page'
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-
-interface ButtonAppBarProps{
-  leftItem: string;
-  rightItem: string;
-  onLogin: () => void;
-}
-export const ButtonAppBar:React.FC<ButtonAppBarProps> = ({ leftItem, rightItem, onLogin }) => {
-  return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-          >
-          </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            {leftItem}
-          </Typography>
-
-          <Button onClick = {onLogin} color="inherit">{rightItem}</Button>
-        </Toolbar>
-      </AppBar>
-    </Box>
-  );
-}
+import { Box } from '@mui/material';
 
 export default function Home() {
+  const [user, setUser] = useState(null);
   const router = useRouter();
   const onLogin = () => {
     router.push('/login');
   }
   return (
     <main>
-      <ButtonAppBar onLogin = {onLogin} leftItem = 'Pantry Item Tracker' rightItem = 'Login'></ButtonAppBar>
+      <ButtonAppBar onLogin = {onLogin} leftItem = 'MyPantry' rightItem = 'Login'></ButtonAppBar>
+      <Box className = 'text-black flex justify-center mt-20 text-3xl' >Login to access pantry tracking</Box>
     </main>
   );
 }
