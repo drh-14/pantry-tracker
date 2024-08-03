@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore, collection, addDoc, doc, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, doc, getDocs, query } from 'firebase/firestore';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "firebase/auth";
 
 const firebaseConfig = {
@@ -14,9 +14,8 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const db = getFirestore(app);
-const auth = getAuth(app);
+export const db = getFirestore(app);
+export const auth = getAuth(app);
 
 export const signIn = async (email:string, password:string) =>{
   try{
@@ -36,10 +35,7 @@ const signUp = async( email: string, password: string) =>{
   }
 }
 
-const addItem = async (item:string) =>{
+const searchItem = async (item:string) =>{
 
 }
 
-const removeItem = async(item:string) =>{
-
-}
