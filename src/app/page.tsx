@@ -3,6 +3,11 @@ import  { ButtonAppBar }  from './components/page'
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Button, Stack, Grid } from '@mui/material';
+import { GridCellParams } from '@mui/x-data-grid';
+import AddIcon  from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { db, auth } from './firebase/firebase';
 import { collection, query, getDocs, addDoc, setDoc, getDoc, deleteDoc, doc, updateDoc, where } from 'firebase/firestore';
 import { onAuthStateChanged, User } from 'firebase/auth';
@@ -10,8 +15,9 @@ import { Box } from '@mui/material';
 
 
 interface EntryProps{
+  id: string;
   item: string;
-  quantity: string;
+  quantity: number
 }
 
 const Entry: React.FC<EntryProps> = ({item, quantity}) =>{
@@ -26,42 +32,44 @@ const Entry: React.FC<EntryProps> = ({item, quantity}) =>{
 }
 
 export default function Home() { 
-  const [pantry, setPantry] = useState<any>([]);
+  const [pantry, setPantry] = useState<{id: string, item: string, quantity: number}[]>([]);
   const [user, setUser] = useState<User|null>(null);
   useEffect( () =>{
     onAuthStateChanged(auth, (user) =>{
       setUser(user);
     })
   });
-  const userPath = 'users/${user}/items';
+
+  const userPath = 'users/darrenh/items';
   const updatePantry = async () =>{
     const snapshot = query(collection(db, userPath))
     const docs = await getDocs(snapshot);
     const pantryList:Array<any> = [];
     docs.forEach((doc) => {
-      const { name, quantity } = doc.data();
+      const { item, quantity } = doc.data();
       pantryList.push({
-        name: name,
+        id: doc.id,
+        item: item,
         quantity: quantity
       })
-      setPantry(pantryList);
     });
+    setPantry(pantryList);
   }
+
   useEffect( () =>{
     updatePantry();
 
   }, [])
+
   const addItem = async (item:string) => {
     try{
-      const docRef = doc(collection(db, userPath), item);
-      const docSnap = await getDoc(docRef);
-      if(docSnap.exists()){
+        const q = query(collection(db, userPath), where('item', '==', item));
+        const querySnap = await getDocs(q);
+        const docSnap = querySnap.docs[0];
+        const docRef = docSnap.ref;
         const { quantity } = docSnap.data();
         await setDoc(docRef, {quantity: quantity + 1}, {merge: true});
-      }
-      else{
-        await addDoc(collection(db, userPath), {name: item, quantity: 1});
-      }
+      await updatePantry();
     }
     catch(error){
       console.log(error);
@@ -70,23 +78,29 @@ export default function Home() {
   
   const removeItem = async (item:string) => {
     try{
-      const docRef = doc(collection(db, userPath), item);
-      const docSnap = await getDoc(docRef);
-      if(docSnap.exists()){
-        const { quantity } = docSnap.data();
-        if(quantity === 1){
-          await deleteDoc(docRef);
+      const q = query(collection(db, userPath), where('item', '==', item));
+      const querySnap = await getDocs(q);
+      const docSnap = querySnap.docs[0];
+      const docRef = docSnap.ref;
+      const { quantity } = docSnap.data();
+      if(quantity === 1){
+        await deleteDoc(docRef);
         }
-        else{
-          await setDoc(docRef, { quantity: quantity - 1 }, { merge: true } );
+      else{
+        await setDoc(docRef, {quantity: quantity - 1});
         }
+      
+      await updatePantry();
       }
-    }
     catch(error){
       console.log(error);
     }
   }
 
+  function getRowId(row: {id: string, item:string, quantity: number}) {
+    return row.id;
+  }
+  
   const router = useRouter();
   const onLogin = () => {
     router.push('/login');
@@ -99,6 +113,15 @@ export default function Home() {
       <Box className = 'text-black flex justify-center mt-14 text-3xl'>To get started, please login or create an account!</Box>
       <Button className = 'w-max p-3 mt-12' variant = 'contained' onClick = {onLogin} >Get started</Button>    
       </div>
+      <DataGrid className = 'w-8/12 m-auto mt-12 text-black' columns = {[{field: 'item', headerName: 'Item', flex:1, width: 150}, {field: 'quantity', headerName: 'Quantity', flex:1, width: 150},
+      {field: 'actions', headerName: 'Actions', width: 150, renderCell: (params) => <div>
+        <AddIcon onClick = { () => addItem(params.row.item)} className= 'mr-4'></AddIcon>
+        <RemoveIcon onClick = { () => removeItem(params.row.item)} className = 'mr-4'></RemoveIcon>
+        <DeleteIcon></DeleteIcon></div> }]} rows = {pantry.map(({id, item, quantity}:EntryProps) =>({
+        id: id,
+        item: item,
+        quantity: quantity
+      }))} getRowId = {getRowId}></DataGrid>
     </main>
   );
 }
