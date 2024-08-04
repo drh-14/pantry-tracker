@@ -87,7 +87,7 @@ export default function Home() {
         await deleteDoc(docRef);
         }
       else{
-        await setDoc(docRef, {quantity: quantity - 1});
+        await setDoc(docRef, {quantity: quantity - 1}, {merge: true});
         }
       
       await updatePantry();
@@ -97,6 +97,20 @@ export default function Home() {
     }
   }
 
+  const deleteItem = async (item:string) =>{
+    try{
+    const q = query(collection(db, userPath), where('item', '==', item));
+    const querySnap = await getDocs(q);
+    const docSnap = querySnap.docs[0];
+    const docRef = docSnap.ref;
+    await deleteDoc(docRef);
+    updatePantry();
+  }
+   catch(error){
+    console.log(error);
+   }
+  }
+  
   function getRowId(row: {id: string, item:string, quantity: number}) {
     return row.id;
   }
@@ -117,7 +131,7 @@ export default function Home() {
       {field: 'actions', headerName: 'Actions', width: 150, renderCell: (params) => <div>
         <AddIcon onClick = { () => addItem(params.row.item)} className= 'mr-4'></AddIcon>
         <RemoveIcon onClick = { () => removeItem(params.row.item)} className = 'mr-4'></RemoveIcon>
-        <DeleteIcon></DeleteIcon></div> }]} rows = {pantry.map(({id, item, quantity}:EntryProps) =>({
+        <DeleteIcon onClick = { () => deleteItem(params.row.item)}></DeleteIcon></div> }]} rows = {pantry.map(({id, item, quantity}:EntryProps) =>({
         id: id,
         item: item,
         quantity: quantity
