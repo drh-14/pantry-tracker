@@ -28,7 +28,16 @@ interface ButtonAppBarProps{
               {leftItem}
             </Typography>
   
-            <Button onClick = {onLogin} color="inherit">{rightItem}</Button>
+            {user == null?(<Button onClick = {onLogin} color="inherit">Login</Button>)
+            :(
+              <div className = 'flex relative flex-col w-max invisible hover:visible justify-center items-center'>
+                <Image className = 'visible' width ='50' height = '50' src = {user.photoURL + ''} alt = 'Profile'></Image>
+                <Button onClick = {logOut} className = 'absolute top-12 w-max' variant = 'contained'>Log Out</Button>
+
+
+
+              </div>
+            )}
           </Toolbar>
         </AppBar>
       </Box>
