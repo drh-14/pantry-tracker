@@ -2,15 +2,14 @@
 import  { ButtonAppBar }  from './components/page'
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { Button, Stack, Grid } from '@mui/material';
-import { GridCellParams } from '@mui/x-data-grid';
+import { Button, Modal, Typography } from '@mui/material';
 import AddIcon  from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { db, auth } from './firebase/firebase';
-import { collection, query, getDocs, addDoc, setDoc, getDoc, deleteDoc, doc, updateDoc, where } from 'firebase/firestore';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { DataGrid, GridOverlay } from '@mui/x-data-grid';
+import { db, signIn, auth } from './firebase/firebase';
+import { collection, query, getDocs, addDoc, setDoc, getDoc, deleteDoc, doc, where } from 'firebase/firestore';
+import { onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { Box } from '@mui/material';
 
 
@@ -19,6 +18,13 @@ interface EntryProps{
   item: string;
   quantity: number
 }
+
+const CustomNoRowsOverlay = () => (
+  <GridOverlay>
+    <h1>No items</h1>
+  </GridOverlay>
+);
+
 
 const Entry: React.FC<EntryProps> = ({item, quantity}) =>{
   return(
@@ -31,54 +37,94 @@ const Entry: React.FC<EntryProps> = ({item, quantity}) =>{
   )
 }
 
+export const logOut = async () => {
+  try {
+    await signOut(auth);
+  } catch (error) {
+    console.error("Error signing out: ", error);
+  }
+};
+
+
 export default function Home() { 
   const [pantry, setPantry] = useState<{id: string, item: string, quantity: number}[]>([]);
-  const [user, setUser] = useState<User|null>(null);
-  useEffect( () =>{
-    onAuthStateChanged(auth, (user) =>{
-      setUser(user);
-    })
-  });
-
-  const userPath = 'users/darrenh/items';
-  const updatePantry = async () =>{
-    const snapshot = query(collection(db, userPath))
+  const [filteredPantry, setFilteredPantry] = useState(pantry);
+  const [open, setOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [item, setItem] = useState('');
+  const [quantity, setQuantity]= useState<number>(0);
+  const [searchItem, setSearchItem] = useState('');
+  const [loading, setLoading] = useState(true);
+  const updatePantry = async () => {
+    const pantryList:Array<{id: string, item: string, quantity: number}> = [];
+    if(user){
+    const snapshot = collection(db, `users/${user.email}/items`);
     const docs = await getDocs(snapshot);
-    const pantryList:Array<any> = [];
     docs.forEach((doc) => {
       const { item, quantity } = doc.data();
       pantryList.push({
         id: doc.id,
         item: item,
         quantity: quantity
-      })
+      });
     });
     setPantry(pantryList);
+    setFilteredPantry(pantryList);
+  }
   }
 
-  useEffect( () =>{
-    updatePantry();
-
-  }, [])
+  const handleChange = (e:React.ChangeEvent<HTMLInputElement>) =>{
+    const searchTerm = e.target.value;
+    setSearchItem(searchTerm);
+    const filteredItems = pantry.filter( entry => entry.item.toLowerCase().includes(e.target.value.toLowerCase()))
+    setFilteredPantry(filteredItems);
+  }
 
   const addItem = async (item:string) => {
     try{
-        const q = query(collection(db, userPath), where('item', '==', item));
+      if(user){
+
+        const q = query(collection(db, `users/${user.email}/items`), where('item', '==', item));
         const querySnap = await getDocs(q);
         const docSnap = querySnap.docs[0];
         const docRef = docSnap.ref;
         const { quantity } = docSnap.data();
         await setDoc(docRef, {quantity: quantity + 1}, {merge: true});
-      await updatePantry();
     }
+    updatePantry();
+  }
     catch(error){
       console.log(error);
     }
   }
-  
+
+  const initializeItem = async(item: string, quantity: number) =>{
+    try{
+      if(user){
+      const q = query(collection(db, `users/${user.email}/items`), where('item', '==', item))
+      const querySnapshot = await getDocs(q);
+      if(!querySnapshot.empty){
+        const docSnap = querySnapshot.docs[0];
+        const currentQuantity = docSnap.data().quantity;
+        await setDoc(docSnap.ref, {quantity: currentQuantity + quantity }, {merge: true})
+      }
+      else{
+        const docRef = doc(collection(db,  `users/${user.email}/items`));
+        await setDoc(docRef, {item: item, quantity: quantity, merge: true});
+      }
+      updatePantry();
+      handleClose();
+    }
+  }
+    catch(error){
+      console.log(error);
+    }
+  }
+
   const removeItem = async (item:string) => {
     try{
-      const q = query(collection(db, userPath), where('item', '==', item));
+      if(user){
+      const q = query(collection(db, `users/${user.email}/items`), where('item', '==', item));
       const querySnap = await getDocs(q);
       const docSnap = querySnap.docs[0];
       const docRef = docSnap.ref;
@@ -92,6 +138,7 @@ export default function Home() {
       
       await updatePantry();
       }
+    }
     catch(error){
       console.log(error);
     }
@@ -99,13 +146,16 @@ export default function Home() {
 
   const deleteItem = async (item:string) =>{
     try{
-    const q = query(collection(db, userPath), where('item', '==', item));
+    if(user){
+
+    const q = query(collection(db, `users/${user.email}/items`), where('item', '==', item));
     const querySnap = await getDocs(q);
     const docSnap = querySnap.docs[0];
     const docRef = docSnap.ref;
     await deleteDoc(docRef);
     updatePantry();
   }
+}
    catch(error){
     console.log(error);
    }
@@ -114,28 +164,92 @@ export default function Home() {
   function getRowId(row: {id: string, item:string, quantity: number}) {
     return row.id;
   }
-  
+
   const router = useRouter();
   const onLogin = () => {
-    router.push('/login');
+    signIn();
   }
+
+  const handleOpen = async () =>{
+    setOpen(true);
+  };
+  
+  const handleClose = async () =>{
+    setOpen(false);
+  };
+
+  useEffect (() =>{
+    if (pantry.length === 0) {  
+      updatePantry();
+    }
+  }
+), []
+
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if(user){
+        setUser(user);
+      }
+      else{
+        setUser(null);
+        setPantry([]);
+      }
+    });
+    return () => unsubscribe();
+  }, [auth]);
+
+  
+
   return (
     <main>
-      <ButtonAppBar onLogin = {onLogin} leftItem = 'MyPantry' rightItem = 'Login'></ButtonAppBar>
+      <ButtonAppBar onLogin = {onLogin} leftItem = 'MyPantry' user = {user} rightItem = 'Login'></ButtonAppBar>
+      {(user == null) ?
       <div className = 'flex justify-center items-center flex-col text-black gap-8'>
       <Box className = 'text-black flex justify-center mt-20 text-3xl' >Welcome to MyPantry, a tool that allows you to quickly and easily add, search for, and remove items from your personal pantry.</Box>
       <Box className = 'text-black flex justify-center mt-14 text-3xl'>To get started, please login or create an account!</Box>
-      <Button className = 'w-max p-3 mt-12' variant = 'contained' onClick = {onLogin} >Get started</Button>    
+      <Button className = 'w-max p-3 mt-12' variant = 'contained' onClick = {async () =>{
+        const user = await signIn();
+        
+      }} >Get started</Button>    
       </div>
-      <DataGrid className = 'w-8/12 m-auto mt-12 text-black' columns = {[{field: 'item', headerName: 'Item', flex:1, width: 150}, {field: 'quantity', headerName: 'Quantity', flex:1, width: 150},
+      :<div className = 'm-auto flex flex-col justify-start gap-6 mt-48'>
+      <div className = ' flex justify-items-start w-7/12 m-auto gap-6'>
+      <Button onClick = {handleOpen} variant = 'contained' className = 'pl-6 pr-6'>Add Item</Button>
+      <Modal
+       open={open}
+       onClose={handleClose}
+       aria-labelledby="Add an item"
+       aria-describedby="placeholder"
+       ><Box sx ={{
+        position: 'absolute',
+        left:'50%',
+        top: '50%',
+        bgcolor: '#2563eb',
+        transform: 'translate(-50%, -50%)',
+        width: '1200',
+        padding: '6'
+       }}><Typography component = {'span'}>
+        <div className= 'flex flex-col gap-4 p-8'>
+        <input className = 'p-4' onChange = {(e: React.ChangeEvent<HTMLInputElement>) => setItem(e.target.value)} placeholder = 'Item'></input>
+        <input className = 'p-4' onChange = {(e: React.ChangeEvent<HTMLInputElement>) => setQuantity(Number(e.target.value))} placeholder = 'Quantity'></input>
+        <Button variant = 'contained' onClick = {() => initializeItem(item, quantity)} >Add Item</Button>
+        </div>
+        </Typography></Box>
+        </Modal>
+      <input value = {searchItem} className = 'p-4 bg-blue w-5/12 text-black border-2' placeholder = 'Search'
+      onChange = {handleChange} ></input>
+      </div>
+      <DataGrid slots = {{noRowsOverlay: CustomNoRowsOverlay}} className = 'm-auto text-black w-7/12' disableColumnSelector disableColumnMenu columns = {[{field: 'item', headerName: 'Item', flex:1, width: 150}, {field: 'quantity', headerName: 'Quantity', flex:1, width: 150},
       {field: 'actions', headerName: 'Actions', width: 150, renderCell: (params) => <div>
         <AddIcon onClick = { () => addItem(params.row.item)} className= 'mr-4'></AddIcon>
         <RemoveIcon onClick = { () => removeItem(params.row.item)} className = 'mr-4'></RemoveIcon>
-        <DeleteIcon onClick = { () => deleteItem(params.row.item)}></DeleteIcon></div> }]} rows = {pantry.map(({id, item, quantity}:EntryProps) =>({
+        <DeleteIcon onClick = { () => deleteItem(params.row.item)}></DeleteIcon></div> }]} rows = {filteredPantry.map(({id, item, quantity}:EntryProps) =>({
         id: id,
         item: item,
         quantity: quantity
       }))} getRowId = {getRowId}></DataGrid>
+      </div>}
     </main>
   );
 }

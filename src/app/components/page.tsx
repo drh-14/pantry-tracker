@@ -2,12 +2,15 @@ import { Button, AppBar, Toolbar, Typography, Box, IconButton, TextField, Avatar
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import defaultTheme from '@mui/material/styles'; 
 import { DefaultTheme } from '@mui/private-theming';
+import  {logOut } from '../firebase/firebase';
+import { User } from 'firebase/auth';
 interface ButtonAppBarProps{
     leftItem: string;
-    rightItem: string;
+    rightItem: React.ReactNode;
     onLogin: () => void;
+    user: User | null;
   }
-  export const ButtonAppBar:React.FC<ButtonAppBarProps> = ({ leftItem, rightItem, onLogin }) => {
+  export const ButtonAppBar:React.FC<ButtonAppBarProps> = ({ leftItem, rightItem, onLogin, user }) => {
     return (
       <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static">
@@ -24,7 +27,9 @@ interface ButtonAppBarProps{
               {leftItem}
             </Typography>
   
-            <Button onClick = {onLogin} color="inherit">{rightItem}</Button>
+            {(user == null)?<Button onClick = {onLogin} color="inherit">{rightItem}</Button>
+            : <div className = 'relative'><div className = 'flex invisible hover:visible flex-col'><img className = 'visible float-right' width = '50' referrerPolicy="no-referrer" src = {user.photoURL ?? ''}></img>
+            <Button onClick = {logOut} variant = 'contained' className="absolute top-0 right--1 mt-12">Log Out</Button></div></div>}
           </Toolbar>
         </AppBar>
       </Box>

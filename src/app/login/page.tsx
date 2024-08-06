@@ -11,7 +11,7 @@ export default function login(){
     }
     return(
     <main>
-    <ButtonAppBar leftItem = 'MyPantry' onLogin = {handleLogin} rightItem = 'Home'></ButtonAppBar>
+    <ButtonAppBar leftItem = 'MyPantry' onLogin = {handleLogin} user = {user} rightItem = 'Home'></ButtonAppBar>
     <LoginForm></LoginForm>
     </main>
     
