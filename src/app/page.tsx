@@ -24,10 +24,6 @@ interface EntryProps{
   quantity: number
 }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> d380cf8d7442e70df0e9dbb03a57e612360e6f1f
 const CustomNoRowsOverlay = () => (
   <GridOverlay>
     <h1>No items</h1>
