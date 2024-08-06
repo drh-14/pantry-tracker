@@ -1,6 +1,5 @@
 'use client'
-import  ButtonAppBar   from './components/page'
-import { useRouter } from 'next/navigation';
+import  { ButtonAppBar }   from './components/page'
 import { useState, useEffect } from 'react';
 import { Button, Modal, Typography, TextField } from '@mui/material';
 import AddIcon  from '@mui/icons-material/Add';
@@ -8,7 +7,7 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DataGrid, GridOverlay } from '@mui/x-data-grid';
 import { db, signIn, auth } from './firebase/firebase';
-import { collection, query, getDocs, addDoc, setDoc, getDoc, deleteDoc, doc, where } from 'firebase/firestore';
+import { collection, query, getDocs, setDoc, deleteDoc, doc, where } from 'firebase/firestore';
 import { onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { Box } from '@mui/material';
 import OpenAI from 'openai';
