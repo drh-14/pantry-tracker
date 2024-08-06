@@ -4,13 +4,13 @@ import { getFirestore, collection, addDoc, doc, getDocs, setDoc, query } from 'f
 import { getAuth, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signOut, UserCredential } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAUyacAUMc_Hbn3uiC_-yvKDDqWTeXC-PI",
-  authDomain: "pantry-tracker-2d0fa.firebaseapp.com",
-  projectId: "pantry-tracker-2d0fa",
-  storageBucket: "pantry-tracker-2d0fa.appspot.com",
-  messagingSenderId: "870815666663",
-  appId: "1:870815666663:web:95e11f0bba1adda71c6d42",
-  measurementId: "G-WFBKTEP4JV"
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.PROJECT_ID,
+  storageBucket: process.env.STORAGE_BUCKET,
+  messagingSenderId: process.env.MESSAGING_SENDER_ID,
+  appId: process.env.APP_ID,
+  measurementId: process.env.MEASUREMENT_ID
 };
 
 const app = initializeApp(firebaseConfig);

@@ -219,7 +219,7 @@ export default function Home() {
     }
   },[fullText, text, index])
 
-  const openai = new OpenAI({apiKey: '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',dangerouslyAllowBrowser: true});
+  const openai = new OpenAI({apiKey: process.env.OPENAI_KEY});
   const AISuggestion = async () =>{
     setText('');
     setFullText('');
