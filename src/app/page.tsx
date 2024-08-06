@@ -2,11 +2,7 @@
 import  ButtonAppBar   from './components/page'
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-<<<<<<< HEAD
 import { Button, Modal, Typography, TextField } from '@mui/material';
-=======
-import { Button, Modal, Typography } from '@mui/material';
->>>>>>> d380cf8d7442e70df0e9dbb03a57e612360e6f1f
 import AddIcon  from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -42,16 +38,11 @@ const Entry: React.FC<EntryProps> = ({item, quantity}) =>{
   )
 }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> d380cf8d7442e70df0e9dbb03a57e612360e6f1f
 export const logOut = async () => {
   try {
     await signOut(auth);
   } catch (error) {
     console.error("Error signing out: ", error);
-<<<<<<< HEAD
   }
 };
 
@@ -179,135 +170,6 @@ export default function Home() {
   const onLogin = () => {
     signIn();
   }
-=======
-  }
-};
-
-
-export default function Home() { 
-  const [pantry, setPantry] = useState<{id: string, item: string, quantity: number}[]>([]);
-  const [filteredPantry, setFilteredPantry] = useState(pantry);
-  const [open, setOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const [item, setItem] = useState('');
-  const [quantity, setQuantity]= useState<number>(0);
-  const [searchItem, setSearchItem] = useState('');
-  const [loading, setLoading] = useState(true);
-  const updatePantry = async () => {
-    const pantryList:Array<{id: string, item: string, quantity: number}> = [];
-    if(user){
-    const snapshot = collection(db, `users/${user.email}/items`);
-    const docs = await getDocs(snapshot);
-    docs.forEach((doc) => {
-      const { item, quantity } = doc.data();
-      pantryList.push({
-        id: doc.id,
-        item: item,
-        quantity: quantity
-      });
-    });
-    setPantry(pantryList);
-    setFilteredPantry(pantryList);
-  }
-  }
-
-  const handleChange = (e:React.ChangeEvent<HTMLInputElement>) =>{
-    const searchTerm = e.target.value;
-    setSearchItem(searchTerm);
-    const filteredItems = pantry.filter( entry => entry.item.toLowerCase().includes(e.target.value.toLowerCase()))
-    setFilteredPantry(filteredItems);
-  }
-
-  const addItem = async (item:string) => {
-    try{
-      if(user){
-
-        const q = query(collection(db, `users/${user.email}/items`), where('item', '==', item));
-        const querySnap = await getDocs(q);
-        const docSnap = querySnap.docs[0];
-        const docRef = docSnap.ref;
-        const { quantity } = docSnap.data();
-        await setDoc(docRef, {quantity: quantity + 1}, {merge: true});
-    }
-    updatePantry();
-  }
-    catch(error){
-      console.log(error);
-    }
-  }
-
-  const initializeItem = async(item: string, quantity: number) =>{
-    try{
-      if(user){
-      const q = query(collection(db, `users/${user.email}/items`), where('item', '==', item))
-      const querySnapshot = await getDocs(q);
-      if(!querySnapshot.empty){
-        const docSnap = querySnapshot.docs[0];
-        const currentQuantity = docSnap.data().quantity;
-        await setDoc(docSnap.ref, {quantity: currentQuantity + quantity }, {merge: true})
-      }
-      else{
-        const docRef = doc(collection(db,  `users/${user.email}/items`));
-        await setDoc(docRef, {item: item, quantity: quantity, merge: true});
-      }
-      updatePantry();
-      handleClose();
-    }
-  }
-    catch(error){
-      console.log(error);
-    }
-  }
-
-  const removeItem = async (item:string) => {
-    try{
-      if(user){
-      const q = query(collection(db, `users/${user.email}/items`), where('item', '==', item));
-      const querySnap = await getDocs(q);
-      const docSnap = querySnap.docs[0];
-      const docRef = docSnap.ref;
-      const { quantity } = docSnap.data();
-      if(quantity === 1){
-        await deleteDoc(docRef);
-        }
-      else{
-        await setDoc(docRef, {quantity: quantity - 1}, {merge: true});
-        }
-      
-      await updatePantry();
-      }
-    }
-    catch(error){
-      console.log(error);
-    }
-  }
-
-  const deleteItem = async (item:string) =>{
-    try{
-    if(user){
-
-    const q = query(collection(db, `users/${user.email}/items`), where('item', '==', item));
-    const querySnap = await getDocs(q);
-    const docSnap = querySnap.docs[0];
-    const docRef = docSnap.ref;
-    await deleteDoc(docRef);
-    updatePantry();
-  }
-}
-   catch(error){
-    console.log(error);
-   }
-  }
-  
-  function getRowId(row: {id: string, item:string, quantity: number}) {
-    return row.id;
-  }
-
-  const router = useRouter();
-  const onLogin = () => {
-    signIn();
-  }
->>>>>>> d380cf8d7442e70df0e9dbb03a57e612360e6f1f
 
   const handleOpen = async () =>{
     setOpen(true);
@@ -324,10 +186,6 @@ export default function Home() {
   }
 ), []
 
-<<<<<<< HEAD
-=======
-
->>>>>>> d380cf8d7442e70df0e9dbb03a57e612360e6f1f
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if(user){
@@ -341,7 +199,6 @@ export default function Home() {
     });
     return () => unsubscribe();
   }, []);
-<<<<<<< HEAD
   
 
   const reformatPantry = () =>{
@@ -377,11 +234,6 @@ export default function Home() {
   }
 
   
-=======
-
-  
-
->>>>>>> d380cf8d7442e70df0e9dbb03a57e612360e6f1f
   return (
     <main>
       <ButtonAppBar onLogin = {onLogin} leftItem = 'MyPantry' user = {user} rightItem = 'Login'></ButtonAppBar>
@@ -429,7 +281,6 @@ export default function Home() {
         id: id,
         item: item,
         quantity: quantity
-<<<<<<< HEAD
       }))} getRowId = {getRowId}>
       </DataGrid>
       <div className = 'mt-20 flex flex-col justify-center items-center gap-8'>
@@ -440,9 +291,6 @@ export default function Home() {
 
 
 
-=======
-      }))} getRowId = {getRowId}></DataGrid>
->>>>>>> d380cf8d7442e70df0e9dbb03a57e612360e6f1f
       </div>}
     </main>
   );
