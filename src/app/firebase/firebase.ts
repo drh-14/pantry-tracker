@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore, collection, addDoc, doc, getDocs } from 'firebase/firestore';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "firebase/auth";
+import { getFirestore, collection, addDoc, doc, getDocs, setDoc, query } from 'firebase/firestore';
+import { getAuth, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signOut, UserCredential } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAUyacAUMc_Hbn3uiC_-yvKDDqWTeXC-PI",
@@ -14,32 +14,35 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const db = getFirestore(app);
-const auth = getAuth(app);
+export const db = getFirestore(app);
+const provider = new GoogleAuthProvider();
 
-export const signIn = async (email:string, password:string) =>{
+export const auth = getAuth();
+export const signIn = async() =>{
   try{
-    await signInWithEmailAndPassword(auth, email, password)
+    const result = await signInWithPopup(auth, provider)
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    if(credential != null && result.user.email != null){
+      const token = credential.accessToken;
+      const userRef = doc(db, 'users', result.user.email);
+      await setDoc(userRef, {email: result.user.email, merge: true});
+      return result.user;
+    }
+    else{
+      return null;
+    }
+  }
+  catch(error){
+    console.log(error);
+    return null;
+  };
+}
+
+export const logOut = async () =>{
+  try{
+    await signOut(auth);
   }
   catch(error){
     console.log(error);
   }
-}
-
-const signUp = async( email: string, password: string) =>{
-  try{
-    await createUserWithEmailAndPassword(auth, email, password)
-  }
-  catch(error){
-    console.log(error);
-  }
-}
-
-const addItem = async (item:string) =>{
-
-}
-
-const removeItem = async(item:string) =>{
-
 }
