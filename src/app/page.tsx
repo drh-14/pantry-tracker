@@ -8,7 +8,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { DataGrid, GridOverlay } from '@mui/x-data-grid';
 import { db, signIn, auth } from '../firebase/firebase';
 import { collection, query, getDocs, setDoc, deleteDoc, doc, where } from 'firebase/firestore';
-import { onAuthStateChanged, User, signOut } from 'firebase/auth';
+import { onAuthStateChanged, User } from 'firebase/auth';
 import { Box } from '@mui/material';
 import OpenAI from 'openai';
 
@@ -38,14 +38,6 @@ const Entry: React.FC<EntryProps> = ({item, quantity}) =>{
   )
 }
 
-
-export const logOut = async () => {
-  try {
-    await signOut(auth);
-  } catch (error) {
-    console.error("Error signing out: ", error);
-  }
-};
 
 export default function Home() { 
   const [pantry, setPantry] = useState<{id: string, item: string, quantity: number}[]>([]);

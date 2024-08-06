@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, doc, getDocs, setDoc, query } from 'firebase/firestore';
-import { getAuth, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signOut, UserCredential } from "firebase/auth";
+import { getFirestore, doc, setDoc} from 'firebase/firestore';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut} from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
