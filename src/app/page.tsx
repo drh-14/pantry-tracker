@@ -1,5 +1,5 @@
 'use client'
-import  { ButtonAppBar }   from './components/page'
+import  { ButtonAppBar }   from '../components/page'
 import { useState, useEffect } from 'react';
 import { Button, Modal, Typography, TextField } from '@mui/material';
 import AddIcon  from '@mui/icons-material/Add';
@@ -236,7 +236,7 @@ export default function Home() {
 
   return (
     <main>
-      <ButtonAppBar onLogin = {onLogin} leftItem = 'MyPantry' user = {user} rightItem = 'Login'></ButtonAppBar>
+      <ButtonAppBar onLogin = {onLogin} user = {user}></ButtonAppBar>
       {(user == null) ?
       <div className = 'flex justify-center items-center flex-col text-black gap-8'>
       <Box className = 'text-black flex justify-center mt-20 text-3xl' >Welcome to MyPantry, a tool that allows you to quickly and easily add, search for, and remove items from your personal pantry.</Box>
