@@ -1,5 +1,5 @@
 'use client'
-import  { ButtonAppBar }  from './components/page'
+import  ButtonAppBar   from './components/page'
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Button, Modal, Typography } from '@mui/material';
@@ -194,10 +194,11 @@ export default function Home() {
       else{
         setUser(null);
         setPantry([]);
+        setFilteredPantry([]);
       }
     });
     return () => unsubscribe();
-  }, [auth]);
+  }, []);
 
   
 

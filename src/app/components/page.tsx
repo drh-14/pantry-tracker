@@ -1,4 +1,5 @@
 import { Button, AppBar, Toolbar, Typography, Box, IconButton, TextField, Avatar, FormControlLabel, Grid, CssBaseline, Checkbox, Link, ThemeProvider, Container, createTheme } from '@mui/material';
+import Image from 'next/image';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import defaultTheme from '@mui/material/styles'; 
 import { DefaultTheme } from '@mui/private-theming';
@@ -10,7 +11,7 @@ interface ButtonAppBarProps{
     onLogin: () => void;
     user: User | null;
   }
-  export const ButtonAppBar:React.FC<ButtonAppBarProps> = ({ leftItem, rightItem, onLogin, user }) => {
+  const ButtonAppBar:React.FC<ButtonAppBarProps> = ({ leftItem, rightItem, onLogin, user }) => {
     return (
       <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static">
@@ -28,7 +29,7 @@ interface ButtonAppBarProps{
             </Typography>
   
             {(user == null)?<Button onClick = {onLogin} color="inherit">{rightItem}</Button>
-            : <div className = 'relative'><div className = 'flex invisible hover:visible flex-col'><img className = 'visible float-right' width = '50' referrerPolicy="no-referrer" src = {user.photoURL ?? ''}></img>
+            : <div className = 'relative'><div className = 'flex invisible hover:visible flex-col'><Image className = 'visible float-right' width = '50' alt= 'Profile' referrerPolicy="no-referrer" src = {user.photoURL ?? ''}></Image>
             <Button onClick = {logOut} variant = 'contained' className="absolute top-0 right--1 mt-12">Log Out</Button></div></div>}
           </Toolbar>
         </AppBar>
@@ -122,3 +123,5 @@ export const LoginForm = (handleLogin:any) =>{
       </ThemeProvider>
     );
 }
+
+export default ButtonAppBar;
