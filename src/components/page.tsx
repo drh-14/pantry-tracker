@@ -1,6 +1,6 @@
 import { Button, AppBar, Toolbar, Typography, Box, IconButton } from '@mui/material';
 import Image from 'next/image';
-import  {logOut } from '../app/firebase/firebase';
+import  {logOut } from '../firebase/firebase';
 import { User } from 'firebase/auth';
 import { NextPage } from 'next';
 export interface ButtonAppBarProps{
