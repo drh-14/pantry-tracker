@@ -20,6 +20,7 @@ interface EntryProps{
   quantity: number
 }
 
+
 const CustomNoRowsOverlay = () => (
   <GridOverlay>
     <h1>No items</h1>
@@ -37,6 +38,7 @@ const Entry: React.FC<EntryProps> = ({item, quantity}) =>{
     </div>
   )
 }
+
 
 export const logOut = async () => {
   try {
@@ -233,7 +235,6 @@ export default function Home() {
     console.log(completion.choices[0].message.content)
   }
 
-  
   return (
     <main>
       <ButtonAppBar onLogin = {onLogin} leftItem = 'MyPantry' user = {user} rightItem = 'Login'></ButtonAppBar>
@@ -287,11 +288,8 @@ export default function Home() {
       <Button onClick = {AISuggestion} className = 'w-1/4' variant = 'contained'>AI Suggestions</Button>
        <TextField  InputProps={{readOnly: true, style: {color: 'black'}}}  value = {text} className = 'w-2/4 rounded-md' multiline rows = {20}></TextField>
       </div>
-
-
-
-
       </div>}
     </main>
   );
 }
+
