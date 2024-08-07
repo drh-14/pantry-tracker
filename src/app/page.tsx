@@ -220,7 +220,7 @@ export default function Home() {
          body: JSON.stringify({
            messages: [{
              role: 'system',
-             content: `Based on the following pantry list, provide recommendations for a recipe to make. DO NOT USE MARKDOWN(#, *, etc.). DO NOT MISSPELL ANYTHING OR MAKE ANY GRAMMATICAL ERRORS. \n ${reformatPantry()}`
+             content: `Based on the following pantry list, provide recommendations for a recipe to make. Also, please inform the user of any items that they are low on, as well as items that they should get for likely future recipes. DO NOT USE MARKDOWN(#, *, etc.). DO NOT MISSPELL ANYTHING OR MAKE ANY GRAMMATICAL ERRORS. \n ${reformatPantry()}`
            }]
          })
        }
