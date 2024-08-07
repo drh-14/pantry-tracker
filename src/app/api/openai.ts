@@ -5,8 +5,7 @@ const openai = new OpenAI({
   });
   
   export default async (req:any, res:any) => {
-    const { messages } = req.body;
-  
+    const  { messages } = req.body;
     try {
       const completion = await openai.chat.completions.create({
         messages,
