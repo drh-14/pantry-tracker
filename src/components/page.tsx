@@ -1,4 +1,3 @@
-'use client'
 import { Button, AppBar, Toolbar, Typography, Box, IconButton } from '@mui/material';
 import Image from 'next/image';
 import  { logOut } from '../firebase/firebase';
