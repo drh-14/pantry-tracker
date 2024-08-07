@@ -183,6 +183,9 @@ export default function Home() {
       else{
         setUser(null);
         setPantry([]);
+        setText('');
+        setFullText('');
+        setIndex(0);
         setFilteredPantry([]);
       }
     });
@@ -207,6 +210,9 @@ export default function Home() {
   },[fullText, text, index])
 
   const AISuggestion = async () =>{
+    setText('');
+    setFullText('');
+    setIndex(0);
       try{
        const response = await fetch('/api/openai', {
          method: 'POST',
