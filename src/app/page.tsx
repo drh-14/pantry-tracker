@@ -210,7 +210,7 @@ export default function Home() {
     }
   },[fullText, text, index])
 
-  const openai = new OpenAI({apiKey: `${process.env.OPENAI_KEY}`, dangerouslyAllowBrowser: true});
+  const openai = new OpenAI({apiKey: process.env.OPENAI_KEY, dangerouslyAllowBrowser: true});
   const AISuggestion = async () =>{
     setText('');
     setFullText('');
