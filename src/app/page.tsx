@@ -193,12 +193,12 @@ export default function Home() {
     return () => unsubscribe();
   }, []);
   
-
   const reformatPantry = () =>{
     return pantry.map(entry => `${entry.item}: ${entry.quantity}`)
   }
    
   useEffect(() => {
+    
     if(fullText){
     if(index < fullText.length){
       const timeout = setTimeout(() => {
@@ -210,20 +210,25 @@ export default function Home() {
     }
   },[fullText, text, index])
 
-  const openai = new OpenAI({apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY, dangerouslyAllowBrowser: true});
   const AISuggestion = async () =>{
-    setText('');
-    setFullText('');
-    setIndex(0);
-    const completion = await openai.chat.completions.create({
-      messages: [{ role: "system", content: `Based on the following pantry list, provide recommendations for a recipe to make. DO NOT MISSPELL ANYTHING OR MAKE ANY GRAMMATICAL ERRORS.
-         Furthermore, please inform the user about item restocks that they should do, including current pantry items that they are low on and items that they may want to buy for likely recipes. DO NOT USE ANY MARKDOWN.
-         \n ${reformatPantry()}`}],
-      model: "gpt-4o-mini",
-    }); 
-    setFullText(completion.choices[0].message.content);
-    console.log(`${reformatPantry}`);
-    console.log(completion.choices[0].message.content)
+      try{
+       const response = await fetch('api/openai', {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({
+           messages: [{
+             role: 'system',
+             content: `Based on the following pantry list, provide recommendations for a recipe to make. DO NOT MISSPELL ANYTHING OR MAKE ANY GRAMMATICAL ERRORS. \n ${reformatPantry()}`
+           }]
+         })
+       }
+     )
+     const data = await response.json();
+     setFullText(data);
+     }
+     catch(error){
+       console.log(error);
+   }
   }
 
   return (
