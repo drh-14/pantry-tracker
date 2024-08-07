@@ -6,11 +6,10 @@ import AddIcon  from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DataGrid, GridOverlay } from '@mui/x-data-grid';
-import { db, signIn, auth } from '../firebase/firebase';
+import { db, signIn, auth } from './firebase/firebase';
 import { collection, query, getDocs, setDoc, deleteDoc, doc, where } from 'firebase/firestore';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { Box } from '@mui/material';
-import OpenAI from 'openai';
 
 
 interface EntryProps{
@@ -19,13 +18,11 @@ interface EntryProps{
   quantity: number
 }
 
-
 const CustomNoRowsOverlay = () => (
   <GridOverlay>
     <h1>No items</h1>
   </GridOverlay>
 );
-
 
 const Entry: React.FC<EntryProps> = ({item, quantity}) =>{
   return(
@@ -37,7 +34,6 @@ const Entry: React.FC<EntryProps> = ({item, quantity}) =>{
     </div>
   )
 }
-
 
 export default function Home() { 
   const [pantry, setPantry] = useState<{id: string, item: string, quantity: number}[]>([]);
@@ -212,7 +208,7 @@ export default function Home() {
 
   const AISuggestion = async () =>{
       try{
-       const response = await fetch('api/openai', {
+       const response = await fetch('/api/openai', {
          method: 'POST',
          headers: { 'Content-Type': 'application/json' },
          body: JSON.stringify({
